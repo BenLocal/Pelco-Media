@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NLog" Version="4.5.11" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Pelco.Media\Pelco.Media.csproj" />
   </ItemGroup>
 

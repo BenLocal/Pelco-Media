@@ -12,10 +12,11 @@ namespace RtspClientDemo
     {
         static void Main(string[] args)
         {
-            var uri = new Uri("rtsp://10.1.72.222:554/h264/ch33/main/av_stream");
-            var creds = new Credentials("admin", "qq111111");
-            using var client = new RtspClient(uri, creds);
-
+            //var uri = new Uri("rtsp://10.1.72.222:554/h264/ch33/main/av_stream");
+            var uri = new Uri("rtsp://34.227.104.115/vod/mp4:BigBuckBunny_115k.mov");
+            //var creds = new Credentials("admin", "qq111111");
+            //using var client = new RtspClient(uri, creds);
+            using var client = new RtspClient(uri);
             // send OPTIONS client
             var response = CheckResponse(client.Request().Options());
             Console.WriteLine($"OPTIONS : {response.Headers["Public"]}");
@@ -50,7 +51,7 @@ namespace RtspClientDemo
 
             var pipeline = MediaPipeline.CreateBuilder()
                                   .Source(client.GetChannelSource(0)) // Create source for receiving interleaved RTP
-                                  .Transform(new DefaultRtpDepacketizer()) // Build metadata frames if fragmented
+                                  .Transform(new H264RtpDepacketizer()) // Build metadata frames if fragmented
                                   .Sink(new H264FileSink())
                                   .Build();
 
@@ -82,7 +83,26 @@ namespace RtspClientDemo
             {
                 // Do something with the received buffer of data
                 // write file
+                buffer.SetPosition(0, ByteBuffer.PositionOrigin.BEGINNING);
+                while (buffer.Position < buffer.Length)
+                {
+                    var length = buffer.ReadInt32();
+                    var nal = buffer.ReadSlice(length);
 
+                    var nalHeader = nal.ReadByte();
+                    var nalType = nalHeader & 0x1F;
+                    if (nalType == 7)
+                    {
+                        var sps = nal;
+                        Console.WriteLine("sps: " + sps.ToString());
+                    }
+                    else if (nalType == 8)
+                    {
+                        nal.SetPosition(0, ByteBuffer.PositionOrigin.BEGINNING);
+                        var pps = nal;
+                        Console.WriteLine("pps: " + pps.ToString());
+                    }
+                }
 
                 return true;
             }

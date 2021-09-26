@@ -63,7 +63,8 @@ namespace RtspClientDemo
                 }
                 else
                 {
-                    _frame.Write(packet.Payload);
+                    //_frame.Write(packet.Payload);
+                    ProcessRTPFrame(packet);
                 }
             }
             else if (IsDamaged)
@@ -73,7 +74,8 @@ namespace RtspClientDemo
             else
             {
                 _processingFragment = true;
-                _frame.Write(packet.Payload);
+                //_frame.Write(packet.Payload);
+                ProcessRTPFrame(packet);
             }
 
             _expectedNextSeqNum = ++seqNum;
