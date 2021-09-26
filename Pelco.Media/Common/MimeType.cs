@@ -69,8 +69,8 @@ namespace Pelco.Media.Common
 
         public bool Is(MimeType type)
         {
-            return (type.Type.Equals(WILDCARD) || type.Type.Equals(Type))
-                   && (type.Subtype.Equals(WILDCARD) || type.Subtype.Equals(Subtype));
+            return (type.Type.Equals(WILDCARD) || type.Type.Equals(Type, StringComparison.InvariantCultureIgnoreCase))
+                   && (type.Subtype.Equals(WILDCARD) || type.Subtype.Equals(Subtype, StringComparison.InvariantCultureIgnoreCase));
         }
 
         public static MimeType Parse(string value)

@@ -538,14 +538,14 @@ namespace Pelco.Media.RTSP.Client
             public RtspResponse SetUp()
             {
                 return _client.Send(_builder.Method(RtspRequest.RtspMethod.SETUP)
-                                            .Uri(_baseUri)
+                                            //.Uri(_baseUri)
                                             .Build());
             }
 
             public void SetUpAsync(RtspResponseCallback callback)
             {
                 _client.SendAsync(_builder.Method(RtspRequest.RtspMethod.SETUP)
-                                          .Uri(_baseUri)
+                                          //.Uri(_baseUri)
                                           .Build(),
                                   callback);
             }
