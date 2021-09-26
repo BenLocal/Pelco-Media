@@ -12,7 +12,7 @@ namespace RtspClientDemo
     {
         static void Main(string[] args)
         {
-            var uri = new Uri("rtsp://10.1.72.220:554/h264/ch33/main/av_stream");
+            var uri = new Uri("rtsp://10.1.72.222:554/h264/ch33/main/av_stream");
             var creds = new Credentials("admin", "qq111111");
             using var client = new RtspClient(uri, creds);
 
@@ -51,7 +51,7 @@ namespace RtspClientDemo
             var pipeline = MediaPipeline.CreateBuilder()
                                   .Source(client.GetChannelSource(0)) // Create source for receiving interleaved RTP
                                   .Transform(new DefaultRtpDepacketizer()) // Build metadata frames if fragmented
-                                  .Sink(new Sink())
+                                  .Sink(new H264FileSink())
                                   .Build();
 
             // send PLAY client
@@ -76,13 +76,14 @@ namespace RtspClientDemo
             return res;
         }
 
-        private sealed class Sink : SinkBase
+        private sealed class H264FileSink : SinkBase
         {
             public override bool WriteBuffer(ByteBuffer buffer)
             {
-
                 // Do something with the received buffer of data
-                Console.WriteLine("get rtp data");
+                // write file
+
+
                 return true;
             }
         }

@@ -514,6 +514,16 @@ namespace Pelco.Media.Pipeline
             Write(buffer._buffer, buffer._startIndex, buffer.Length);
         }
 
+        public void Write(ByteBuffer buffer, Int32 offset)
+        {
+            if (buffer == null)
+            {
+                throw new ArgumentNullException("Cannot write to Buffer provided buffer is null");
+            }
+
+            Write(buffer._buffer, offset, buffer.Length);
+        }
+
         public void Write(byte[] buffer, Int32 offset, Int32 count)
         {
             if (buffer == null)

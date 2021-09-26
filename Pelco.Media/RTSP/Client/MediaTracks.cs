@@ -80,7 +80,7 @@ namespace Pelco.Media.RTSP.Client
                     // If a filter is defined only return tracks that match the
                     // defined filter type; otherwise, return all tracks.
 
-                    if (IsAddressSet(connectionAddr))
+                    if (!IsAddressSet(connectionAddr))
                     {
                         // If defined as 0.0.0.0 or ::0 then replace with the SDP connection address.
                         connectionAddr = sdpConnectionAddr;
