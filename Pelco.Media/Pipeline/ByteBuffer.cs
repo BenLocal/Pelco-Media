@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
-
 namespace Pelco.Media.Pipeline
 {
     public class ByteBuffer : IDisposable
@@ -468,6 +467,30 @@ namespace Pelco.Media.Pipeline
             return result;
         }
 
+        public byte[] ReadRawBytes()
+        {
+            var result = new byte[_length];
+            SetPosition(0, PositionOrigin.BEGINNING);
+            var bytesRead = Read(result, 0, _length);
+
+            if (bytesRead < _length)
+            {
+                if (bytesRead == 0)
+                {
+                    // Not remaining data just return an empty array
+                    return new byte[0];
+                }
+
+                // Lets trim the array since it was smaller
+                var copy = new byte[bytesRead];
+                Buffer.BlockCopy(result, 0, copy, 0, bytesRead);
+
+                return copy;
+            }
+
+            return result;
+        }
+
         public Int32 Read(byte[] buffer, Int32 offset, Int32 count)
         {
             if (buffer == null)
@@ -521,7 +544,7 @@ namespace Pelco.Media.Pipeline
                 throw new ArgumentNullException("Cannot write to Buffer provided buffer is null");
             }
 
-            Write(buffer._buffer, offset, buffer.Length);
+            Write(buffer._buffer, buffer._startIndex + offset, buffer.Length - offset);
         }
 
         public void Write(byte[] buffer, Int32 offset, Int32 count)

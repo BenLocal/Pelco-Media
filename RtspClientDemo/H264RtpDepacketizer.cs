@@ -121,6 +121,7 @@ namespace RtspClientDemo
             }
             else if (nal_header_type == 28)
             {
+                Console.WriteLine("Frag FU-A");
                 // 1个NALs的数据拆分包
                 var fuHeader = packet.Payload.ReadByte();
                 int fu_header_s = (fuHeader >> 7) & 0x01;  // start marker
@@ -128,13 +129,14 @@ namespace RtspClientDemo
                 int fu_header_r = (fuHeader >> 5) & 0x01;  // reserved. should be 0
                 int fu_header_type = (fuHeader >> 0) & 0x1F; // Original NAL unit header
 
+                Console.WriteLine("Frag FU-A s=" + fu_header_s + "e=" + fu_header_e);
                 if (fu_header_s == 1 && fu_header_e == 0)
                 {
                     // Start of Fragment. 开始包
                     // Initiise the fragmented_nal byte array
                     // Build the NAL header with the original F and NRI flags but use the the Type field from the fu_header_type
                     byte reconstructed_nal_type = (byte)((nal_header_f_bit << 7) + (nal_header_nri << 5) + fu_header_type);
-
+                    _fragmented_nal = new ByteBuffer();
                     _fragmented_nal.WriteByte(reconstructed_nal_type);
                     _fragmented_nal.Write(packet.Payload, 2);
                 }
@@ -154,8 +156,6 @@ namespace RtspClientDemo
 
                     _frame.WriteInt32(_fragmented_nal.Length);
                     _frame.Write(_fragmented_nal);
-
-                    _fragmented_nal = new ByteBuffer();
                 }
             }
             else
