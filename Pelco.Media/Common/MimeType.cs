@@ -41,6 +41,7 @@ namespace Pelco.Media.Common
         public static readonly MimeType MPEG_AUDIO = CreateAudioType("mpeg");
         public static readonly MimeType PCMU_AUDIO = CreateAudioType("PCMU");
         public static readonly MimeType PCMA_AUDIO = CreateAudioType("PCMA");
+        public static readonly MimeType AAC_MPEG4_AUDIO = CreateAudioType("mpeg4-generic");
 
         // Image types
         public static readonly MimeType ANY_IMAGE = CreateImageType(WILDCARD);
@@ -101,7 +102,7 @@ namespace Pelco.Media.Common
 
         public static MimeType CreateAudioType(string subtype)
         {
-            return new MimeType(APPLICATION_TYPE, subtype);
+            return new MimeType(AUDIO_TYPE, subtype);
         }
 
         public static MimeType CreateImageType(string subtype)

@@ -31,6 +31,8 @@ namespace Pelco.Media.RTSP.Client
 
         internal SdpRtpMap RtpMap { get; set; }
 
+        public AFmtPMap AFmtPMap { get; internal set; }
+
         public static Builder CreateBuilder()
         {
             return new Builder();
@@ -43,6 +45,7 @@ namespace Pelco.Media.RTSP.Client
             private MimeType _type;
             private IPAddress _address;
             private SdpRtpMap _rtpmap;
+            private AFmtPMap _aFmtPMap;
 
             public Builder()
             {
@@ -56,6 +59,7 @@ namespace Pelco.Media.RTSP.Client
                 _rtpmap = null;
                 _address = null;
                 _type = MimeType.ANY_TYPE;
+                _aFmtPMap = null;
 
                 return this;
             }
@@ -78,6 +82,13 @@ namespace Pelco.Media.RTSP.Client
             {
                 _rtpmap = rtpmap;
 
+                return this;
+            }
+
+            public Builder AFmtPMap(AFmtPMap aFmtPMap)
+            {
+                _aFmtPMap = aFmtPMap;
+                
                 return this;
             }
 
@@ -104,6 +115,7 @@ namespace Pelco.Media.RTSP.Client
                     Port = _port,
                     RtpMap = _rtpmap,
                     Type = _type,
+                    AFmtPMap = _aFmtPMap
                 };
             }
         }

@@ -135,6 +135,7 @@
     <Compile Include="RTSP\RtspResponse.cs" />
     <Compile Include="RTSP\RtspConnection.cs" />
     <Compile Include="RTSP\RtspVersion.cs" />
+    <Compile Include="RTSP\SDP\AFmtPMap.cs" />
     <Compile Include="RTSP\SDP\SdpRtpMap.cs" />
     <Compile Include="RTSP\SDP\Attribute.cs" />
     <Compile Include="RTSP\SDP\BandwidthInfo.cs" />

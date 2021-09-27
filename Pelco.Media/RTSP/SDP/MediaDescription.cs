@@ -61,6 +61,8 @@ namespace Pelco.Media.RTSP.SDP
 
         public List<Attribute> Attributes { get; private set; }
 
+        public AFmtPMap FmtpMap { get; private set; }
+
         #endregion
 
         /// <summary>
@@ -76,6 +78,18 @@ namespace Pelco.Media.RTSP.SDP
             Attributes.Where(a => "rtpmap" == a.Name).ToList().ForEach(a =>
             {
                 builder.Add(SdpRtpMap.Parse(a.Value));
+            });
+
+            return builder.ToImmutable();
+        }
+
+        public ImmutableList<AFmtPMap> GetAFmtpMaps()
+        {
+            var builder = ImmutableList.CreateBuilder<AFmtPMap>();
+
+            Attributes.Where(a => "fmtp" == a.Name).ToList().ForEach(a =>
+            {
+                builder.Add(AFmtPMap.Parse(a.Value));
             });
 
             return builder.ToImmutable();

@@ -74,6 +74,7 @@
     <Compile Include="RSTP\TransportHeaderTests.cs" />
     <Compile Include="RTP\OnvifRtpHeaderTests.cs" />
     <Compile Include="RTP\RtpPacketTests.cs" />
+    <Compile Include="SDP\SdpRtpMapTest.cs" />
     <Compile Include="SDP\SessionDescriptionTests.cs" />
     <Compile Include="Utils\NetworkUtil.cs" />
     <Compile Include="Utils\RandomUtils.cs" />

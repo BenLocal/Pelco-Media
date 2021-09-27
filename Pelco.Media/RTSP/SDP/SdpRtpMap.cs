@@ -6,13 +6,17 @@
 // written permission of Pelco.
 //
 using System;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace Pelco.Media.RTSP.SDP
 {
+    /// <summary>
+    /// a=rtpmap:<payload type> <encoding name>/<clock rate>[/<encoding parameters>]
+    /// </summary>
     public class SdpRtpMap
     {
-        private static Regex REGEX = new Regex(@"^\s*(\d+)\s+(.+)\s*/\s*(\d+)(\s*/\s*(.+))?", RegexOptions.Compiled);
+        //private static Regex REGEX = new Regex(@"^\s*(\d+)\s+(.+)\s*/\s*(\d+)(\s*/\s*(.+))?", RegexOptions.Compiled);
 
         internal SdpRtpMap()
         {
@@ -44,31 +48,29 @@ namespace Pelco.Media.RTSP.SDP
 
         public static SdpRtpMap Parse(string str)
         {
-            var match = REGEX.Match(str);
-
-            if (!match.Success)
+            var items = str.Split(new char[] { ' ' }, 2);
+            if (items.Length != 2)
             {
                 throw new SdpParseException($"Unable to parse malformed rtpmap attriute '{str}'");
             }
 
-            try
+            var subItems = items[1].Split('/');
+            if (subItems.Length != 2 && subItems.Length != 3)
             {
-                var builder = SdpRtpMap.CreateBuilder()
-                                       .PayloadType(ushort.Parse(match.Groups[1].Value))
-                                       .EncodingName(match.Groups[2].Value.Trim())
-                                       .ClockRate(uint.Parse(match.Groups[3].Value));
-
-                if (match.Groups.Count == 6)
-                {
-                    builder.EncodingParameters(match.Groups[5].Value.Trim());
-                }
-
-                return builder.Build();
+                throw new SdpParseException($"Unable to parse malformed rtpmap attriute '{str}'");
             }
-            catch (Exception e)
+
+            var builder = CreateBuilder()
+                .PayloadType(ushort.Parse(items[0]))
+                .EncodingName(subItems[0].Trim())
+                .ClockRate(uint.Parse(subItems[1]));
+
+            if (subItems.Length == 3)
             {
-                throw new SdpParseException($"Unable to parse rtpmap attribute '{str}'", e);
+                builder.EncodingParameters(subItems[2].Trim());
             }
+
+            return builder.Build();
         }
 
         public static Builder CreateBuilder()

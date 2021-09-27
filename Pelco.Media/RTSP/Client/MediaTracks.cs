@@ -55,6 +55,9 @@ namespace Pelco.Media.RTSP.Client
 
                 var mimeType = MimeType.Create(type, rtpmap.EncodingName);
 
+                var afmtpMaps = md.GetAFmtpMaps();
+                var afmtpMap = afmtpMaps.IsEmpty ? new AFmtPMap() : afmtpMaps.First();
+
                 if (mimeType.Is(APPLICATION_SPOOFED))
                 {
                     // The MediaGateway and Vxpro us spoofing to determine the client's intentions of
@@ -73,6 +76,7 @@ namespace Pelco.Media.RTSP.Client
                                           .Port(md.Port)
                                           .Type(mimeType)
                                           .Uri(controlUri)
+                                          .AFmtPMap(afmtpMap)
                                           .Build());
                 }
                 else if ((  filter != null && mimeType.Is(filter)) || (filter == null))
@@ -94,6 +98,7 @@ namespace Pelco.Media.RTSP.Client
                                           .RtpMap(rtpmap)
                                           .Type(mimeType)
                                           .Uri(controlUri)
+                                          .AFmtPMap(afmtpMap)
                                           .Build());
                 }
             });
