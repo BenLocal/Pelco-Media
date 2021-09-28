@@ -755,7 +755,7 @@ namespace Pelco.Media.Pipeline
             {
                 throw new ArgumentOutOfRangeException("Cannot slice buffer with offset greater than buffer length");
             }
-            else if ((offset + count) >= Length)
+            else if ((offset + count) > Length)
             {
                 throw new ArgumentOutOfRangeException($"Cannot slice buffer offset + count > length={_length}");
             }

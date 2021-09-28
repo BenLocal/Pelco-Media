@@ -17,7 +17,7 @@ namespace RtspClientDemo
         private bool _processingFragment;
         private ushort _expectedNextSeqNum;
 
-        public AACRtpDepacketizer() : base(new TimestampDemarcator(), new MarkerDemarcator())
+        public AACRtpDepacketizer() : base(new TimestampDemarcator(), new AlwaysTrueDemarcator())
         {
             _disposed = false;
             _frame = new ByteBuffer();
@@ -90,6 +90,35 @@ namespace RtspClientDemo
             return assembled;
         }
 
+        // rfc3640 2.11.  Global Structure of Payload Format
+        //
+        // +---------+-----------+-----------+---------------+
+        // | RTP     | AU Header | Auxiliary | Access Unit   |
+        // | Header  | Section   | Section   | Data Section  |
+        // +---------+-----------+-----------+---------------+
+        //
+        //           <----------RTP Packet Payload----------->
+        //
+        // rfc3640 3.2.1.  The AU Header Section
+        //
+        // +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+- .. -+-+-+-+-+-+-+-+-+-+
+        // |AU-headers-length|AU-header|AU-header|      |AU-header|padding|
+        // |                 |   (1)   |   (2)   |      |   (n)   | bits  |
+        // +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+- .. -+-+-+-+-+-+-+-+-+-+
+        //
+        // rfc3640 3.3.6.  High Bit-rate AAC
+        //
+        // rtp_parse_mp4_au()
+        //
+        //
+        // 3.2.3.1.  Fragmentation
+        //
+        //   A packet SHALL carry either one or more complete Access Units, or a
+        //   single fragment of an Access Unit.  Fragments of the same Access Unit
+        //   have the same time stamp but different RTP sequence numbers.  The
+        //   marker bit in the RTP header is 1 on the last fragment of an Access
+        //   Unit, and 0 on all other fragments.
+        //
         private void ProcessRTPFrame(RtpPacket packet)
         {
             // 重置
@@ -97,25 +126,44 @@ namespace RtspClientDemo
 
             while (packet.Payload.Position < packet.Payload.Length)
             {
-                // 开始是2bytes的AU Header长度，2bytes的AU Header内容
+                // 开始是2bytes的AU Header长度
+                // 2 bytes of AU Header payload
                 if (packet.Payload.Position + 4 > packet.Payload.Length)
                 {
-                    break;
+                    return;
                 }
 
-                var auHeaderLength = (int)Math.Ceiling(packet.Payload.ReadInt16() / 8.0);
-                var auHeader = packet.Payload.ReadInt16();
+                // AU-headers-length固定两个字节的长度,单位是bits
+                var auHeadersLengthBites = (((packet.Payload.ReadByte() << 8) + (packet.Payload.ReadByte() << 0)));
+                // AU-headers-length的byte长度
+                var auHeadersLength = (int)Math.Ceiling((double)auHeadersLengthBites / 8.0);
 
-                // 13bits的acc帧长度，剩余3bits是acc帧delta
-                var aacFrameSize = ((packet.Payload.ReadByte() << 8) + (packet.Payload.ReadByte() << 0)) >> 3;
-                if (packet.Payload.Position + aacFrameSize > packet.Payload.Length)
+                // 这里的2是写死的，正常是外部传入auSize和auIndex所占位数的和
+                // auSize和auIndex所在的位数是写死的13bit，3bit，标准的做法应该从外部传入，比如从sdp中获取后传入
+                var auHeaderSize = 2;
+                // 有多少个AU-Header
+                var nbAuHeaders = auHeadersLength / auHeaderSize;
+
+                int offset = packet.Payload.Position + auHeadersLength;
+                for (var i = 0; i < nbAuHeaders; i++)
                 {
-                    // 没有足够的数据
-                    break;
-                }
+                    var firstBits = packet.Payload.ReadByte();
+                    var sceondBits = packet.Payload.ReadByte();
+                    // 13bits的acc帧长度，剩余3bits是acc帧delta
+                    var auSize = ((firstBits << 8) + (sceondBits << 0)) >> 3;
+                    // aac_index
+                    int _ = sceondBits & 0x03; // 3 bits
 
-                _frame.WriteInt32(aacFrameSize);
-                _frame.Write(packet.Payload.ReadSlice(aacFrameSize));
+                    if (offset + auSize > packet.Payload.Length)
+                    {
+                        // 没有足够的数据
+                        break;
+                    }
+
+                    _frame.WriteInt32(auSize);
+                    _frame.Write(packet.Payload.Slice(offset, auSize));
+                    offset += auSize;
+                }
             }
         }
     }

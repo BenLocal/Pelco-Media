@@ -78,7 +78,7 @@ namespace RtspClientDemo
                 bs.AddValue(0, 1); // (k) copyrighted id
                 bs.AddValue(0, 1); // (l) copyright id start
                 bs.AddValue(length + 7, 13); // (m) AAC data + size of the ASDT header
-                bs.AddValue(2047, 11); // (n) buffer fullness ???
+                bs.AddValue(0x7FF, 11); // (n) buffer fullness ???
                 int num_acc_frames = 1;
                 bs.AddValue(num_acc_frames - 1, 1); // (o) num of AAC Frames, minus 1
 

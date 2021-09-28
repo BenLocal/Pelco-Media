@@ -14,9 +14,12 @@ namespace RtspClientDemo
         static void Main(string[] args)
         {
             //var uri = new Uri("rtsp://10.1.72.222:554/h264/ch33/main/av_stream");
-            var uri = new Uri("rtsp://34.227.104.115/vod/mp4:BigBuckBunny_115k.mov");
             //var creds = new Credentials("admin", "qq111111");
             //using var client = new RtspClient(uri, creds);
+
+            //var uri = new Uri("rtsp://34.227.104.115/vod/mp4:BigBuckBunny_115k.mov");
+            var uri = new Uri("rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov");
+            //var uri = new Uri("rtsp://10.1.72.200:555/room1");
             using var client = new RtspClient(uri);
 
 

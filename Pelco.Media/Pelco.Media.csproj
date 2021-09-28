@@ -90,6 +90,7 @@
     <Compile Include="Pipeline\TransformBase.cs" />
     <Compile Include="Pipeline\ObjectTypeTransformBase.cs" />
     <Compile Include="Pipeline\Transforms\AlwaysFalseDemarcator.cs" />
+    <Compile Include="Pipeline\Transforms\AlwaysTrueDemarcator.cs" />
     <Compile Include="Pipeline\Transforms\BufferToRtpPacketTransform.cs" />
     <Compile Include="Pipeline\Transforms\IRtpDemarcator.cs" />
     <Compile Include="Pipeline\Transforms\MarkerDemarcator.cs" />

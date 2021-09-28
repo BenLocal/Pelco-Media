@@ -206,10 +206,10 @@ namespace Pelco.Media.RTSP
             {
                 throw new SdpParseException("Unable to parse body as SDP, response does not contain a body");
             }
-            else if (ContentType != SessionDescription.MIME_TYPE)
-            {
-                throw new SdpParseException($"Response body is not of type '{SessionDescription.MIME_TYPE}'");
-            }
+            //else if (ContentType != SessionDescription.MIME_TYPE)
+            //{
+            //    throw new SdpParseException($"Response body is not of type '{SessionDescription.MIME_TYPE}'");
+            //}
 
             return SessionDescription.Parse(Encoding.UTF8.GetString(Body));
         }

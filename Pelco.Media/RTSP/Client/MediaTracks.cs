@@ -90,7 +90,7 @@ namespace Pelco.Media.RTSP.Client
                         connectionAddr = sdpConnectionAddr;
                     }
 
-                    var addrs = Dns.GetHostAddresses(connectionAddr);
+                    //var addrs = Dns.GetHostAddresses(connectionAddr);
 
                     builder.Add(MediaTrack.CreateBuilder()
                                           .Address(Dns.GetHostAddresses(connectionAddr)[0])

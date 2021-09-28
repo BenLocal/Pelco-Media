@@ -11,7 +11,9 @@ using Pelco.Media.Pipeline;
 using Pelco.Media.RTSP.SDP;
 using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Net;
+using System.Security.Policy;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -42,11 +44,11 @@ namespace Pelco.Media.RTSP.Client
         {
             _uri = uri ?? throw new ArgumentNullException("Cannot create RTSP client from null uri");
             _cseq = 0;
-            _credentials = creds;
+            _credentials = CreateCredentialsFromUrl(creds);
             _defaultTimeout = TimeSpan.FromSeconds(20);
             _callbacks = new ConcurrentDictionary<int, AsyncResponse>();
             _sources = new ConcurrentDictionary<int, RtpInterleaveMediaSource>();
-            _connection = new RtspConnection(IPAddress.Parse(uri.Host), uri.Port == -1 ? DEFAULT_RTSP_PORT : uri.Port);
+            _connection = new RtspConnection(Dns.GetHostAddresses(uri.Host).FirstOrDefault(), uri.Port == -1 ? DEFAULT_RTSP_PORT : uri.Port);
             _listener = new RtspListener(_connection, OnRtspChunk);
             _rtpQueue = new BlockingCollection<ByteBuffer>();
 
@@ -370,6 +372,35 @@ namespace Pelco.Media.RTSP.Client
             }
 
             LOG.Info($"Exiting RTSP/RTP interleaved processing thread({Thread.CurrentThread.ManagedThreadId}) for '{_connection.Endpoint}'");
+        }
+
+        private Credentials CreateCredentialsFromUrl(Credentials defaultCreds)
+        {
+            if (defaultCreds != null)
+            {
+                return defaultCreds;
+            }
+
+            try
+            {
+                if (defaultCreds == null)
+                {
+                    var hostname = _uri.Host;
+                    var port = _uri.Port;
+
+
+                    var username = _uri.UserInfo.Split(new char[] { ':' })[0];
+                    var password = _uri.UserInfo.Split(new char[] { ':' })[1];
+                    _uri = new Uri(_uri.GetComponents((UriComponents.AbsoluteUri & ~UriComponents.UserInfo), UriFormat.UriEscaped));
+                    return new Credentials(username, password);
+                }
+            }
+            catch
+            {
+                // igonre
+            }
+
+            return null;
         }
 
         // Helper class used for handling async responses and making them synchronous.
