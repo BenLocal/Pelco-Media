@@ -59,9 +59,16 @@ namespace RtspClientDemo
             buffer.SetPosition(0, ByteBuffer.PositionOrigin.BEGINNING);
             while (buffer.Position < buffer.Length)
             {
-                var length = buffer.ReadInt32();
-                var acc = buffer.ReadSlice(length);
+              
 
+                var length = buffer.ReadInt32();
+                if (length <= 0)
+                {
+                    break;
+                }
+                Console.WriteLine($"读取{length}长度字节，buffer中Position：{buffer.Position}, legth:{buffer.Length}");
+                var acc = buffer.ReadSlice(length);
+                Console.WriteLine($"acc中Position：{acc.Position}, legth:{acc.Length}");
                 // ASDT header format
                 int protection_absent = 1;
                 BitStream bs = new BitStream();

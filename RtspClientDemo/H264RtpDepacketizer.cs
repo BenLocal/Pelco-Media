@@ -51,34 +51,42 @@ namespace RtspClientDemo
 
         protected override void addRtpPacket(RtpPacket packet)
         {
-            ushort seqNum = packet.SequenceNumber;
-
-            if (_processingFragment)
+            try
             {
-                if (_expectedNextSeqNum != seqNum)
+                ushort seqNum = packet.SequenceNumber;
+
+                if (_processingFragment)
                 {
-                    LOG.Debug($"Lost packet expected sequence number '{_expectedNextSeqNum}' got '{seqNum}'");
-                    _processingFragment = false;
-                    IsDamaged = true;
+                    if (_expectedNextSeqNum != seqNum)
+                    {
+                        LOG.Debug($"Lost packet expected sequence number '{_expectedNextSeqNum}' got '{seqNum}'");
+                        _processingFragment = false;
+                        IsDamaged = true;
+                    }
+                    else
+                    {
+                        //_frame.Write(packet.Payload);
+                        ProcessRTPFrame(packet);
+                    }
+                }
+                else if (IsDamaged)
+                {
+                    LOG.Debug($"Disgarding fragment '{seqNum}' from damaged frame");
                 }
                 else
                 {
+                    _processingFragment = true;
                     //_frame.Write(packet.Payload);
                     ProcessRTPFrame(packet);
                 }
-            }
-            else if (IsDamaged)
-            {
-                LOG.Debug($"Disgarding fragment '{seqNum}' from damaged frame");
-            }
-            else
-            {
-                _processingFragment = true;
-                //_frame.Write(packet.Payload);
-                ProcessRTPFrame(packet);
-            }
 
-            _expectedNextSeqNum = ++seqNum;
+                _expectedNextSeqNum = ++seqNum;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+                throw e;
+            }
         }
 
         protected override ByteBuffer Assemble()

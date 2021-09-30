@@ -57,6 +57,7 @@ namespace RtspClientDemo
                 var length = buffer.ReadInt32();
                 var nal = buffer.ReadSlice(length);
 
+                nal.SetPosition(0, ByteBuffer.PositionOrigin.BEGINNING);
                 var nalHeader = nal.ReadByte();
                 var nalType = nalHeader & 0x1F;
                 if (nalType == 7) _sps = nal;

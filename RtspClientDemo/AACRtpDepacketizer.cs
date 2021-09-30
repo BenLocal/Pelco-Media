@@ -124,17 +124,11 @@ namespace RtspClientDemo
             // 重置
             packet.Payload.SetPosition(0, ByteBuffer.PositionOrigin.BEGINNING);
 
-            while (packet.Payload.Position < packet.Payload.Length)
+            // 开始是2bytes的AU Header长度
+            while (packet.Payload.Position + 2 < packet.Payload.Length)
             {
-                // 开始是2bytes的AU Header长度
-                // 2 bytes of AU Header payload
-                if (packet.Payload.Position + 4 > packet.Payload.Length)
-                {
-                    return;
-                }
-
                 // AU-headers-length固定两个字节的长度,单位是bits
-                var auHeadersLengthBites = (((packet.Payload.ReadByte() << 8) + (packet.Payload.ReadByte() << 0)));
+                var auHeadersLengthBites = (packet.Payload.ReadByte() << 8) + (packet.Payload.ReadByte() << 0);
                 // AU-headers-length的byte长度
                 var auHeadersLength = (int)Math.Ceiling((double)auHeadersLengthBites / 8.0);
 
@@ -147,6 +141,12 @@ namespace RtspClientDemo
                 int offset = packet.Payload.Position + auHeadersLength;
                 for (var i = 0; i < nbAuHeaders; i++)
                 {
+                    // 没有足够的2个byte
+                    if (packet.Payload.Position + 2 >= packet.Payload.Length)
+                    {
+                        break;
+                    }
+
                     var firstBits = packet.Payload.ReadByte();
                     var sceondBits = packet.Payload.ReadByte();
                     // 13bits的acc帧长度，剩余3bits是acc帧delta
@@ -161,7 +161,14 @@ namespace RtspClientDemo
                     }
 
                     _frame.WriteInt32(auSize);
-                    _frame.Write(packet.Payload.Slice(offset, auSize));
+
+                    var a = packet.Payload.Slice(offset, auSize);
+                    if (a.Length != auSize)
+                    {
+                        Console.WriteLine("数据不足");
+                        break;
+                    }
+                    _frame.Write(a);
                     offset += auSize;
                 }
             }
