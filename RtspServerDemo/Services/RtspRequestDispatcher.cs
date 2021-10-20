@@ -76,9 +76,7 @@ namespace RtspServerDemo.Services
         /// <returns></returns>
         public RtspResponse Dispatch(RtspRequest request)
         {
-            IRequestHandler handler = null;
-
-            if (_handlers.TryGetValue("live", out handler))
+            if (_handlers.TryGetValue("live", out var handler))
             {
                 switch (request.Method)
                 {

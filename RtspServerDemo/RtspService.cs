@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.Extensions.Hosting;
+using Pelco.Media.Common;
 using Pelco.Media.RTSP.Server;
 using RtspServerDemo.Services;
 using System;
@@ -30,9 +31,14 @@ namespace RtspServerDemo
                     if ((mutexAcquired = mutex.WaitOne(5000, false)))
                     {
                         var dispatcher = new RtspRequestDispatcher();
-                        var handler = new 
-                        dispatcher.RegisterHandler("live", handler);
-                        _server = new RtspServer(8554, dispatcher);
+
+                        var url = "rtsp://10.1.72.222:554/h264/ch33/main/av_stream";
+                        var creds = new Credentials("admin", "qq111111");
+
+                        var hander = new RequestHandler(new Sources.RtspSource(url, creds));
+
+                        dispatcher.RegisterHandler("live", hander);
+                        _server = new RtspServer(8557, dispatcher);
                         _server.Start();
                     }
                 }
@@ -51,6 +57,8 @@ namespace RtspServerDemo
                     {
                         mutex.ReleaseMutex();
                     }
+
+                    //_server?.Stop();
                 }
 
                 return Task.CompletedTask;

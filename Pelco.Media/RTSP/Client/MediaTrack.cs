@@ -29,7 +29,7 @@ namespace Pelco.Media.RTSP.Client
 
         public uint Port { get; internal set; }
 
-        internal SdpRtpMap RtpMap { get; set; }
+        public SdpRtpMap RtpMap { get; set; }
 
         public AFmtPMap AFmtPMap { get; internal set; }
 
