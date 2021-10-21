@@ -57,5 +57,7 @@ namespace Pelco.Media.RTSP.Server
         /// <param name="sessionId"></param>
         /// <returns>A dictionary of key/value pairs.</returns>
         Dictionary<string, object> GetSessionProperties(string sessionId);
+
+        IRtspSession GetSession(string sessionId);
     }
 }

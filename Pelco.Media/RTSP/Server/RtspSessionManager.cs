@@ -139,7 +139,7 @@ namespace Pelco.Media.RTSP.Server
             return new Dictionary<string, object>();
         }
 
-        protected IRtspSession GetSession(string sessionId)
+        public IRtspSession GetSession(string sessionId)
         {
             return _sessions.ContainsKey(sessionId) ? _sessions[sessionId] : null;
         }

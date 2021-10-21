@@ -95,7 +95,7 @@ namespace Pelco.Media.RTSP.Server
                 return builder.Status(RtspResponse.Status.SessionNotFound).Build();
             }
 
-            return builder.Build(); ;
+            return builder.Build();
         }
 
         /// <summary>

@@ -32,7 +32,7 @@ namespace RtspServerDemo
                     {
                         var dispatcher = new RtspRequestDispatcher();
 
-                        var url = "rtsp://10.1.72.222:554/h264/ch33/main/av_stream";
+                        var url = "rtsp://admin:qq111111@10.1.72.222:554/h264/ch33/main/av_stream";
                         var creds = new Credentials("admin", "qq111111");
 
                         var hander = new RequestHandler(new Sources.RtspSource(url, creds));

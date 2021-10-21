@@ -15,12 +15,12 @@ namespace RtspClientDemo
         {
             try
             {
-                var uri = new Uri("rtsp://10.1.72.222:554/h264/ch33/main/av_stream");
-                var creds = new Credentials("admin", "qq111111");
-                using var client = new RtspClient(uri, creds);
-
+                var uri = new Uri(" rtsp://127.0.0.1:8557/live");
+                //var creds = new Credentials("admin", "qq111111");
+                //using var client = new RtspClient(uri, creds);
+                using var client = new RtspClient(uri);
                 //var uri = new Uri("rtsp://34.227.104.115/vod/mp4:BigBuckBunny_115k.mov");
-               // var uri = new Uri("rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov");
+                // var uri = new Uri("rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov");
                 //var uri = new Uri("rtsp://10.1.72.200:555/room1");
                 //using var client = new RtspClient(uri);
 
@@ -72,6 +72,7 @@ namespace RtspClientDemo
                         }
 
                         response = SendSetUp(client, track, transport.Build(), ref session);
+                        Console.WriteLine($"SDP :{track.ID} --> {response.ToString()}");
                     }
                 }
 

@@ -17,6 +17,7 @@ namespace RtspServerDemo.Services
         public RequestHandler(RtspSource rtspSource)
         {
             _rtspSource = rtspSource;
+            _rtspSource.Initialize();
         }
 
         public override RtspResponse SetUp(RtspRequest request)
@@ -38,9 +39,23 @@ namespace RtspServerDemo.Services
             {
                 PortPair channels = new PortPair(_currentChannel, _currentChannel + 1);
                 _currentChannel += 2;
-                var track = _rtspSource.GetTrack(request.URI);
-                var session = new RtspInterleavedSession(request.Context, _rtspSource, channels, track);
-                _sessionManager.RegisterSession(session);
+
+                IRtspSession session = null;
+                if (request.Session != null)
+                {
+                    session = _sessionManager.GetSession(request.Session);
+                }
+
+                if (session == null)
+                {
+                    session = new RtspInterleavedSession(_rtspSource);
+                    (session as RtspInterleavedSession).AddRtspRequest(request, channels);
+                    _sessionManager.RegisterSession(session);
+                }
+                else
+                {
+                    (session as RtspInterleavedSession).AddRtspRequest(request, channels);
+                }
 
                 transport = TransportHeader.CreateBuilder()
                                            .Type(TransportType.RtspInterleaved)
@@ -56,7 +71,7 @@ namespace RtspServerDemo.Services
         protected override SessionDescription CreateSDP(RtspRequest request)
         {
             // set sdp
-            return _rtspSource.GetSessionDescription();
+            return _rtspSource.SessionDescription();
         }
     }
 }
